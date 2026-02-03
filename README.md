@@ -1,1 +1,1 @@
-# jalin-qr-mapper
+# QR Mapper
