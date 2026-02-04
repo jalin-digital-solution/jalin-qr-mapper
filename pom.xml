@@ -67,6 +67,18 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot.experimental</groupId>
+			<artifactId>spring-boot-thin-layout</artifactId>
+			<version>1.0.31.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>3.4.4</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing</artifactId>
 			<version>1.6.2</version>
@@ -97,7 +109,39 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>org.springframework.boot.experimental</groupId>
+						<artifactId>spring-boot-thin-layout</artifactId>
+						<version>1.0.31.RELEASE</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot.experimental</groupId>
+				<artifactId>spring-boot-thin-maven-plugin</artifactId>
+				<version>1.0.31.RELEASE</version>
+				<executions>
+					<execution>
+						<!-- Download the dependencies at build time -->
+						<id>resolve</id>
+						<goals>
+							<goal>resolve</goal>
+						</goals>
+						<inherited>false</inherited>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
