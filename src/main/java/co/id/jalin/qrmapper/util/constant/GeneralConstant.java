@@ -10,10 +10,17 @@ public class GeneralConstant {
     public static final String DOUBLE_DASH = "--";
     public static final String EMPTY_STRING = "";
     public static final String SPACE_STRING = " ";
+    public static final String UNDERSCORE = "_";
+    public static final String DOT = ".";
+    public static final String COLON_SEPARATOR = ":";
     public static final String SEMICOLON_SEPARATOR = ";";
+    public static final String BASIC_AUTH_PREFIX = "Basic ";
+    public static final String DEFAULT_TOKEN_EXPIRE = "3600";
 
     public static final String ACCESS_TOKEN_TYPE_VALUE = "Bearer";
     public static final String X_TRACE_ID = "X-TRACE-ID";
+
+    public static final String HMAC_SHA256 = "HmacSHA256";
 
     public static final String VAR_APP_PARAM = "APP_PARAM";
     public static final String VAR_APP_PARAM_VALUE = "APP_PARAM_VALUE";
@@ -21,6 +28,20 @@ public class GeneralConstant {
     public static final String VAR_CRED_DATA_BY_CRED_ID = "CRED_DATA_BY_CRED_ID";
     public static final String VAR_RC_MAPPING_JALIN_TO_DANA = "RC_MAPPING_JALIN_TO_DANA";
     public static final String VAR_RC_MAPPING_DANA_TO_JALIN = "RC_MAPPING_DANA_TO_JALIN";
+    public static final String VAR_ALTO_EXPIRE_TOKEN_IN_SECOND = "ALTO_EXPIRE_TOKEN_IN_SECOND";
+
+    public static final String VAR_ALG = "alg";
+    public static final String VAR_TYP = "typ";
+    public static final String VAR_EXP = "exp";
+
+    public static final String VAR_USER = "username";
+    public static final String VAR_PASS = "password";
+    public static final String VAR_GRANT_TYPE = "grantType";
+
+    public static final String VAL_TOKEN = "token";
+    public static final String VAL_HS256 = "HS256";
+    public static final String VAL_JWT = "JWT";
+    public static final String VAL_GRANT_TYPE = "client_credentials";
 
     public static final String QR_DOM_MPM_ESB_TO_DANA = "QR-DOM-MPM-ESB-TO-DANA";
     public static final String QR_DOM_MPM_DANA_TO_ESB = "QR-DOM-MPM-DANA-TO-ESB";
@@ -34,4 +55,11 @@ public class GeneralConstant {
 
     public static final Integer NOT_EXIST = 0;
     public static final Integer AUTH_INDEX_OF_ACCESS_TOKEN = 1;
+    public static final Integer BASIC_AUTH_PART_LENGTH = 2;
+    public static final Integer BASIC_AUTH_USER_IDX = 0;
+    public static final Integer BASIC_AUTH_PASS_IDX = 1;
+    public static final Integer JWT_PART_LENGTH = 3;
+    public static final Integer JWT_HEADER_IDX = 0;
+    public static final Integer JWT_BODY_IDX = 1;
+    public static final Integer JWT_SIGN_IDX = 2;
 }
