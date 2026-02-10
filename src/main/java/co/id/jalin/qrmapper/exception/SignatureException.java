@@ -4,21 +4,21 @@ package co.id.jalin.qrmapper.exception;
  * JWT exception as exception for all error occur when calculate JWT.
  * Default XX - XX XX
  */
-public class JwtException extends HttpHeaderException {
+public class SignatureException extends HttpHeaderException {
 
-    public JwtException(){
+    public SignatureException(){
         super();
     }
 
-    public JwtException(String message){
+    public SignatureException(String message){
         super(message);
     }
 
-    public JwtException(Throwable throwable){
+    public SignatureException(Throwable throwable){
         super(throwable);
     }
 
-    public JwtException(String message, Throwable throwable){
+    public SignatureException(String message, Throwable throwable){
         super(message,throwable);
     }
 }

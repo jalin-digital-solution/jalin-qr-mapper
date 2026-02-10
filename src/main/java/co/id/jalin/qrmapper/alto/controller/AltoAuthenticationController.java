@@ -16,7 +16,7 @@ public class AltoAuthenticationController extends AltoContextController{
 
     private final AltoAuthenticationService altoAuthenticationService;
 
-    @PostMapping("${api.path.auth.token}")
+    @PostMapping("${api.path.alto.auth.token}")
     public ResponseEntity<AltoAuthTokenResponse> token(
             @RequestHeader("Authorization") String authorization,
             @RequestBody AltoAuthTokenRequest request

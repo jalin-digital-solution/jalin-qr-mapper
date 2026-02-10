@@ -5,7 +5,7 @@ import co.id.jalin.qrmapper.alto.dto.AltoAuthTokenResponse;
 import co.id.jalin.qrmapper.cache.ApplicationParameterManager;
 import co.id.jalin.qrmapper.cache.CredentialDataManager;
 import co.id.jalin.qrmapper.dto.BasicAuth;
-import co.id.jalin.qrmapper.service.JwtService;
+import co.id.jalin.qrmapper.service.JwtAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import static co.id.jalin.qrmapper.util.StringUtil.base64UrlEncode;
 import static co.id.jalin.qrmapper.util.StringUtil.buildCredDataByUserPassKey;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
 
@@ -24,7 +25,7 @@ public class AltoAuthenticationService {
 
     private final ApplicationParameterManager applicationParameterManager;
     private final CredentialDataManager credentialDataManager;
-    private final JwtService jwtService;
+    private final JwtAuthenticationService jwtAuthenticationService;
 
     public AltoAuthTokenResponse authenticate(String authorization, AltoAuthTokenRequest request) {
 
@@ -50,14 +51,14 @@ public class AltoAuthenticationService {
 
         // 5. Payload
         Map<String, Object> payload = new HashMap<>();
-        payload.put(VAR_USER, Base64.getEncoder().encodeToString(credential.getUsername().getBytes()));
-        payload.put(VAR_PASS, Base64.getEncoder().encodeToString(credential.getPassword().getBytes()));
+        payload.put(VAR_USER, base64UrlEncode(credential.getUsername()));
+        payload.put(VAR_PASS, base64UrlEncode(credential.getPassword()));
         payload.put(VAR_GRANT_TYPE, request.getGrantType());
 
         // 6. Generate token (choose one)
-        var accessToken = jwtService.createToken(payload, credential.getSecretKey(), expireTime);
+        var accessToken = jwtAuthenticationService.createToken(payload, credential.getSecretKey(), expireTime);
         // OR MANUAL VERSION
-        // var accessToken = jwtService.createTokenManual(payload, credential.getSecretKey(), expireTime);
+        // var accessToken = jwtAuthenticationService.createTokenManual(payload, credential.getSecretKey(), expireTime);
 
         return AltoAuthTokenResponse.builder()
                 .accessToken(accessToken)

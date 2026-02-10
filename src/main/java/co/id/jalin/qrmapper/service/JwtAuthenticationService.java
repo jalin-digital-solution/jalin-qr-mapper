@@ -1,6 +1,7 @@
 package co.id.jalin.qrmapper.service;
 
 import co.id.jalin.qrmapper.exception.JwtException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -22,7 +23,7 @@ import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtAuthenticationService {
 
     private final ObjectMapper objectMapper;
 
@@ -71,18 +72,14 @@ public class JwtService {
      */
     public Map<String, Object> validateTokenManual(String token, String secretKey) {
         try {
-            String[] parts = token.split("\\.");
-            if (parts.length != JWT_PART_LENGTH) {
-                throw new IllegalArgumentException("Invalid token");
-            }
+            String[] parts = splitTokenPart(token);
 
             String signature = encryptWithSecretToHex(parts[JWT_HEADER_IDX] + DOT + parts[JWT_BODY_IDX], secretKey, HMAC_SHA256);
             if (!signature.equals(parts[JWT_SIGN_IDX])) {
                 throw new IllegalArgumentException("Invalid signature");
             }
 
-            TypeReference<Map<String,Object>> ref = new TypeReference<>(){};
-            Map<String, Object> payload = objectMapper.readValue(base64UrlDecode(parts[JWT_BODY_IDX]),ref);
+            Map<String, Object> payload = parseTokenPayload(parts);
             long exp = ((Number) payload.get(VAR_EXP)).longValue();
 
             if (Instant.now().getEpochSecond() > exp) {
@@ -104,4 +101,18 @@ public class JwtService {
             throw new JwtException(e);
         }
     }
+
+    public String[] splitTokenPart(String token){
+        String[] parts = token.split("\\.");
+        if (parts.length != JWT_PART_LENGTH) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+        return parts;
+    }
+
+    public Map<String, Object> parseTokenPayload(String[] parts) throws JsonProcessingException {
+        TypeReference<Map<String,Object>> ref = new TypeReference<>(){};
+        return objectMapper.readValue(base64UrlDecode(parts[JWT_BODY_IDX]),ref);
+    }
+
 }

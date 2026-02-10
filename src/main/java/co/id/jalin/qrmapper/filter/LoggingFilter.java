@@ -2,6 +2,7 @@ package co.id.jalin.qrmapper.filter;
 
 import co.id.jalin.qrmapper.configuration.wrapper.BufferedResponseWrapper;
 import co.id.jalin.qrmapper.configuration.wrapper.MultiReadHttpServletRequest;
+import co.id.jalin.qrmapper.context.RequestContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static co.id.jalin.qrmapper.util.StringUtil.handlePostMethod;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
 
 
@@ -32,6 +34,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private final Tracer tracer;
     private final ObjectMapper objectMapper;
+    private final RequestContext requestContext;
 
     // Exclude paths that don't need logging (optional)
     private final List<String> EXCLUDE_PATHS = Arrays.asList(
@@ -63,6 +66,9 @@ public class LoggingFilter extends OncePerRequestFilter {
         var queryString = request.getQueryString();
         var requestBody = handlePostMethod(requestWrapper);
 
+        requestContext.setTraceId(traceId);
+        requestContext.setRequestBody(requestBody);
+
         var mapHeaderRequest = Collections.list(requestWrapper.getHeaderNames())
                 .stream().collect(Collectors.toMap(s -> s, requestWrapper::getHeader));
         log.info("RequestServlet with Remote Host {} {}", request.getRemoteHost(), request.getServletPath());
@@ -78,13 +84,6 @@ public class LoggingFilter extends OncePerRequestFilter {
 
         long duration = System.currentTimeMillis() - startTime;
         log.info("ResponseTime {}ms",duration);
-    }
-
-    private String handlePostMethod(HttpServletRequest requestWrapper) throws IOException {
-        if (HttpMethod.POST.name().equals(requestWrapper.getMethod()) && Objects.nonNull(requestWrapper.getContentType())) {
-            return requestWrapper.getReader().lines().collect(Collectors.joining(EMPTY_STRING));
-        }
-        return EMPTY_STRING;
     }
 
     private boolean shouldExclude(String path) {
