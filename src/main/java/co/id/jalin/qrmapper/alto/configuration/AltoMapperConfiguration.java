@@ -75,7 +75,7 @@ public class AltoMapperConfiguration {
                             .responseCode(ALT_RESP_CODE_DO_NOT_HONOR)
                             .responseText(ALT_RESP_MESSAGE_DO_NOT_HONOR)
                             .referenceNumber(source.getReferenceNumber())
-                            .networkReferenceNumber(generateLocalRandomRrn())
+                            .networkReferenceNumber(source.getNetworkReferenceNumber())
                             .invoiceNo(DEFAULT_INVOICE_NUMBER)
                             .currencyCode(source.getCurrencyCode())
                             .amount(source.getAmount())

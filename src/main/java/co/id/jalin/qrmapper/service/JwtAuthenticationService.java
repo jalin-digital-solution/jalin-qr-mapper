@@ -115,4 +115,11 @@ public class JwtAuthenticationService {
         return objectMapper.readValue(base64UrlDecode(parts[JWT_BODY_IDX]),ref);
     }
 
+    public String resolveBearerToken(String authorization) {
+        if (authorization.length() > JWT_AUTHORIZATION_IDX && authorization.startsWith(ACCESS_TOKEN_TYPE_VALUE)) {
+            return authorization.substring(JWT_AUTHORIZATION_IDX);
+        }
+        return EMPTY_STRING;
+    }
+
 }

@@ -1,6 +1,7 @@
 package co.id.jalin.qrmapper.client;
 
 import co.id.jalin.qrmapper.cache.CredentialDataManager;
+import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditResponseDto;
 import co.id.jalin.qrmapper.exception.WebClientGeneralException;
@@ -36,6 +37,7 @@ public class EsbRestClient {
     @Value("${esb.base.url}")
     private String esbBaseUrl;
 
+    private final RequestContext requestContext;
     private final WebClient webClientEsb;
     private final ObjectMapper objectMapper;
     private final SignatureService signatureService;
@@ -43,13 +45,12 @@ public class EsbRestClient {
 
     public PaymentCreditResponseDto sendPayment(
             PaymentCreditRequestDto requestDto,
-            String credentialIdentifier,
             String apiPathPayment
     ) {
         try {
             var credentialData = credentialDataManager
-                    .getCredDataByCredId(buildCredDataByCredIdKey(credentialIdentifier,apiPathPayment))
-                    .orElseThrow(() -> new WebClientGeneralException("Credential data destination is not set with identifier "+ credentialIdentifier));
+                    .getCredDataByCredId(buildCredDataByCredIdKey(requestDto.getIssuerId(),apiPathPayment))
+                    .orElseThrow(() -> new WebClientGeneralException("Credential data destination is not set with identifier "+ requestDto.getIssuerId()));
             var uri = UriComponentsBuilder.fromUriString(esbBaseUrl + apiPathPayment)
                 .queryParam(VAR_USER, credentialData.getUsername())
                 .queryParam(VAR_PASS, credentialData.getPassword())
@@ -62,6 +63,8 @@ public class EsbRestClient {
             log.info("WebClient Target POST {}", uri);
             log.info("WebClient RequestHeader {}", objectMapper.writeValueAsString(mapHeaders));
             log.info("WebClient RequestBody {}", objectMapper.writeValueAsString(requestDto));
+            requestContext.getTransactionLog().setLeg2Rrn(requestDto.getRrn());
+            requestContext.getTransactionLog().setLeg2(objectMapper.writeValueAsString(requestDto));
             var responseEntityStr = webClientEsb.post().uri(uri)
                 .headers(httpHeaders -> httpHeaders.setAll(mapHeaders))
                 .bodyValue(requestDto)
@@ -73,11 +76,13 @@ public class EsbRestClient {
             assert responseEntityStr != null;
             log.info("WebClient ResponseHeader {}", objectMapper.writeValueAsString(responseEntityStr.getHeaders().toSingleValueMap()));
             log.info("WebClient ResponseBody {}", responseEntityStr.getBody());
+            requestContext.getTransactionLog().setLeg3(responseEntityStr.getBody());
 
             var responseDto = objectMapper.readValue(responseEntityStr.getBody(),PaymentCreditResponseDto.class);
             if (Objects.isNull(responseDto.getResponseCode())) {
                 throw new NoSuchFieldException("Field response code is null");
             }
+            requestContext.getTransactionLog().setLeg3Rc(responseDto.getResponseCode());
             return responseDto;
         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException | NoSuchFieldException e) {
             throw new WebClientGeneralException(e.getMessage());

@@ -94,6 +94,7 @@ public class GeneralConstant {
     public static final Integer BASIC_AUTH_PART_LENGTH = 2;
     public static final Integer BASIC_AUTH_USER_IDX = 0;
     public static final Integer BASIC_AUTH_PASS_IDX = 1;
+    public static final Integer JWT_AUTHORIZATION_IDX = 7;
     public static final Integer JWT_PART_LENGTH = 3;
     public static final Integer JWT_HEADER_IDX = 0;
     public static final Integer JWT_BODY_IDX = 1;

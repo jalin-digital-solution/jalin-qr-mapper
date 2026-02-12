@@ -47,9 +47,10 @@ public class TransactionLogFilter extends OncePerRequestFilter {
             requestContext.setTransactionLog(TransactionLog.builder().build());
             chain.doFilter(requestWrapper,responseWrapper);
 
-            
             requestContext.getTransactionLog().setTraceId(requestContext.getTraceId());
             requestContext.getTransactionLog().setApiService(request.getServletPath());
+            requestContext.getTransactionLog().setLeg1(requestContext.getRequestBody());
+            requestContext.getTransactionLog().setLeg4(responseWrapper.getContent());
 
             transactionLogService.saveTransactionLogAsync(requestContext.getTransactionLog());
             return;

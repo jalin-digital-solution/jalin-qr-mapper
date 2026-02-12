@@ -35,8 +35,9 @@ public class AltoValidationService {
         if (isBlank(h.get(X_TIMESTAMP)))   throw new HttpHeaderException("Missing X-TIMESTAMP");
         if (isBlank(h.get(X_SIGNATURE)))   throw new HttpHeaderException("Missing X-SIGNATURE");
 
-        var credentialData = getCredentialDataFromTokenPayload(h.get(AUTHORIZATION));
-        validateToken(h,credentialData.getSecretKey());
+        var token = jwtAuthenticationService.resolveBearerToken(h.get(AUTHORIZATION));
+        var credentialData = getCredentialDataFromTokenPayload(token);
+        validateToken(token,credentialData.getSecretKey());
         validateSignature(h,relativeUrl,credentialData.getSecretKey());
     }
 
@@ -55,9 +56,9 @@ public class AltoValidationService {
         }
     }
 
-    public void validateToken(Map<String,String> h, String secretKey){
+    public void validateToken(String token, String secretKey){
         try {
-           var claims = jwtAuthenticationService.validateToken(h.get(AUTHORIZATION),secretKey);
+           var claims = jwtAuthenticationService.validateToken(token,secretKey);
             if (!claims.containsKey(VAR_GRANT_TYPE)) {
                 throw new IllegalArgumentException("Invalid grant type not exist");
             }

@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface TransactionLogRepository extends JpaRepository<TransactionLog, Long>, JpaSpecificationExecutor<TransactionLog> {
 
-    Optional<TransactionLog> findFirstByIssuerRrnAndApiService(
-            String issuerRrn,
+    Optional<TransactionLog> findFirstByLeg1RrnAndApiService(
+            String leg1Rrn,
             String apiService
     );
 
