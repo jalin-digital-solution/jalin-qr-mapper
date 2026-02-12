@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,9 +24,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static co.id.jalin.qrmapper.util.StringUtil.handlePostMethod;
-import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
+import static co.id.jalin.qrmapper.util.constant.GeneralConstant.DOUBLE_DASH;
+import static co.id.jalin.qrmapper.util.constant.GeneralConstant.X_TRACE_ID;
 
 
+@Order(3)
 @Log4j2
 @Component
 @RequiredArgsConstructor

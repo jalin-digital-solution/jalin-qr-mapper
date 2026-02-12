@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @IdClass(AccessTokenId.class)
-@Table(name = "access_token", schema = "qrpayment")
+@Table(name = "access_token")
 public class AccessToken {
 
     @Id

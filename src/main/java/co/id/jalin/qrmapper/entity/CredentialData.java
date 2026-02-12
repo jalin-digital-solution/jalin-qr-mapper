@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "credential_data", schema = "qrpayment")
+@Table(name = "credential_data")
 public class CredentialData {
 
     @Id

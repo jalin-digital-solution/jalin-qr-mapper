@@ -23,16 +23,14 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
         name = "transaction_log",
-        schema = "qrpayment",
         indexes = {
                 @Index(
-                        name = "transaction_log_issuer_rrn_idx",
-                        columnList = "issuer_rrn, api_service"
+                        name = "transaction_log_leg1_rrn_idx",
+                        columnList = "leg1_rrn, api_service"
                 )
         }
 )
@@ -44,20 +42,30 @@ public class TransactionLog {
     private String traceId;
     private String apiService;
 
-    private String issuerRc;
-    private String acquirerRc;
-    private String issuerRrn;
-    private String acquirerRrn;
+    @Column(name = "leg1_rrn")
+    private String leg1Rrn;
+    @Column(name = "leg2_rrn")
+    private String leg2Rrn;
+
+    @Column(name = "leg3_rc")
+    private String leg3Rc;
+    @Column(name = "leg4_rc")
+    private String leg4Rc;
+
+    private String invoiceNumber;
     private String switchingRrn;
+    private String additionalInfo;
     @Column(precision = 20, scale = 2)
     private BigDecimal amount;
 
-    private String issuerBodyRequest;
-    private String issuerBodyResponse;
-    private String acquirerBodyRequest;
-    private String acquirerBodyResponse;
-
-    private String additionalInfo;
+    @Column(name = "leg1", columnDefinition = "TEXT")
+    private String leg1;
+    @Column(name = "leg2", columnDefinition = "TEXT")
+    private String leg2;
+    @Column(name = "leg3", columnDefinition = "TEXT")
+    private String leg3;
+    @Column(name = "leg4", columnDefinition = "TEXT")
+    private String leg4;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

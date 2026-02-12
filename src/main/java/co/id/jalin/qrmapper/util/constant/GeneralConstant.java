@@ -89,6 +89,7 @@ public class GeneralConstant {
     public static final String ALT_RESP_MESSAGE_INVALID_TOKEN = "Invalid token";
 
     public static final Integer NOT_EXIST = 0;
+    public static final Integer MONEY_DECIMAL_SCALE = 2;
     public static final Integer AUTH_INDEX_OF_ACCESS_TOKEN = 1;
     public static final Integer BASIC_AUTH_PART_LENGTH = 2;
     public static final Integer BASIC_AUTH_USER_IDX = 0;

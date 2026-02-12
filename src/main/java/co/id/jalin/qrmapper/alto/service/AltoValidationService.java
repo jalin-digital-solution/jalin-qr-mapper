@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,33 +35,38 @@ public class AltoValidationService {
         if (isBlank(h.get(X_TIMESTAMP)))   throw new HttpHeaderException("Missing X-TIMESTAMP");
         if (isBlank(h.get(X_SIGNATURE)))   throw new HttpHeaderException("Missing X-SIGNATURE");
 
-        var credentialData = validateToken(h);
+        var credentialData = getCredentialDataFromTokenPayload(h.get(AUTHORIZATION));
+        validateToken(h,credentialData.getSecretKey());
         validateSignature(h,relativeUrl,credentialData.getSecretKey());
     }
 
-    public CredentialData validateToken(Map<String,String> h){
+    private CredentialData getCredentialDataFromTokenPayload(String token){
         try {
-            var token = h.get(AUTHORIZATION);
             var parts = jwtAuthenticationService.splitTokenPart(token);
-            var payload = jwtAuthenticationService.parseTokenPayload(parts);
+            Map<String, Object> payload = jwtAuthenticationService.parseTokenPayload(parts);
             var key = buildCredDataByUserPassKey(
                     base64UrlDecode((String) payload.get(VAR_USER)),
                     base64UrlDecode((String) payload.get(VAR_PASS)),
                     VAL_TOKEN
             );
-
-            var credentialData = credentialDataManager.getCredDataByUserPass(key).orElseThrow();
-            var claims = jwtAuthenticationService.validateToken(h.get(AUTHORIZATION),credentialData.getSecretKey());
-            if (!claims.containsKey(VAR_GRANT_TYPE)) {
-                throw new IllegalArgumentException("Invalid grant type not exist");
-            }
-            return credentialData;
+            return credentialDataManager.getCredDataByUserPass(key).orElseThrow();
         } catch (Exception e) {
             throw new JwtException(e);
         }
     }
 
-    public boolean validateSignature(Map<String,String> h, String relativeUrl, String secretKey){
+    public void validateToken(Map<String,String> h, String secretKey){
+        try {
+           var claims = jwtAuthenticationService.validateToken(h.get(AUTHORIZATION),secretKey);
+            if (!claims.containsKey(VAR_GRANT_TYPE)) {
+                throw new IllegalArgumentException("Invalid grant type not exist");
+            }
+        } catch (Exception e) {
+            throw new JwtException(e);
+        }
+    }
+
+    public void validateSignature(Map<String,String> h, String relativeUrl, String secretKey){
         try {
             List<String> signatureComponent = new ArrayList<>();
             signatureComponent.add(HttpMethod.POST.name());
@@ -71,9 +74,11 @@ public class AltoValidationService {
             signatureComponent.add(h.get(X_CLIENT_KEY));
             signatureComponent.add(signatureService.generateSignatureDigestInstance(requestContext.getRequestBody(),SHA_256));
             signatureComponent.add(h.get(X_TIMESTAMP));
-
             var signComponentStr = String.join(COLON_SEPARATOR,signatureComponent);
-            return Objects.equals(signatureService.generateSignatureMacInstance(signComponentStr,secretKey,HMAC_SHA256),h.get(X_SIGNATURE));
+            var generatedSign = signatureService.generateSignatureMacInstance(signComponentStr, secretKey, HMAC_SHA256);
+            if (!Objects.equals(generatedSign,h.get(X_SIGNATURE))) {
+                throw new IllegalArgumentException("Invalid signature value");
+            }
         } catch (Exception e) {
             throw new SignatureException(e);
         }

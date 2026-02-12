@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(
         name = "application_parameter",
-        schema = "qrpayment",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_application_parameter_name", columnNames = "name")
         }

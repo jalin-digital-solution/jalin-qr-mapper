@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(
         name = "rc_mapping",
-        schema = "qrpayment",
         indexes = {
                 @Index(
                         name = "rc_mapping_service_code_idx",
