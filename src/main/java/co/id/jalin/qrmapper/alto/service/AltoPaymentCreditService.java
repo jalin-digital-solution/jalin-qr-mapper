@@ -47,7 +47,11 @@ public class AltoPaymentCreditService {
         if (Objects.nonNull(rcMapping)) {
             responseDto.setResponseCode(rcMapping.getOutputRc());
             responseDto.setResponseText(rcMapping.getOutputRcMessage());
-            Optional.ofNullable(esbResponseDto.getResponseCode()).ifPresent(responseDto::setInvoiceNo);
+            Optional
+                    .ofNullable(esbResponseDto.getResponseCode())
+                    .ifPresent(
+                            s -> responseDto.setInvoiceNo(esbResponseDto.getInvoiceNumber())
+                    );
         }
         requestContext.getTransactionLog().setLeg4Rc(responseDto.getResponseCode());
         requestContext.getTransactionLog().setInvoiceNumber(responseDto.getInvoiceNo());

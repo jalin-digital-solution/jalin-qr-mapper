@@ -4,6 +4,7 @@ import co.id.jalin.qrmapper.cache.CredentialDataManager;
 import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditResponseDto;
+import co.id.jalin.qrmapper.exception.WebClientConnectTimeoutException;
 import co.id.jalin.qrmapper.exception.WebClientGeneralException;
 import co.id.jalin.qrmapper.exception.WebClientResponseTimeoutException;
 import co.id.jalin.qrmapper.service.SignatureService;
@@ -91,7 +92,7 @@ public class EsbRestClient {
                 throw new WebClientResponseTimeoutException(e.getMessage());
             }
             if (e.getCause() instanceof ConnectException) {
-                throw new WebClientResponseTimeoutException(e.getMessage());
+                throw new WebClientConnectTimeoutException(e.getMessage());
             }
             throw new WebClientGeneralException(e.getMessage());
         }

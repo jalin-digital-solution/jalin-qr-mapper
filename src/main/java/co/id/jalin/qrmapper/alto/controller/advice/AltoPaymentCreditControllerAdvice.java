@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
 
 @Log4j2
+@Order(5)
 @RestControllerAdvice(assignableTypes = AltoPaymentCreditController.class)
 @RequiredArgsConstructor
 public class AltoPaymentCreditControllerAdvice {
@@ -42,24 +44,26 @@ public class AltoPaymentCreditControllerAdvice {
             var requestBody = objectMapper.readValue(requestBodyStr, AltoPaymentCreditRequestDto.class);
             var responseBody = altoModelMapper.map(requestBody, AltoPaymentCreditResponseDto.class);
 
-            if (exception instanceof HttpHeaderException) {
-                responseBody.setResponseCode(ALT_RESP_CODE_FORMAT_ERROR);
-                responseBody.setResponseText(ALT_RESP_MESSAGE_FORMAT_ERROR);
+            switch (exception) {
+                case HttpHeaderException ignored:
+                    responseBody.setResponseCode(ALT_RESP_CODE_FORMAT_ERROR);
+                    responseBody.setResponseText(ALT_RESP_MESSAGE_FORMAT_ERROR);
+                    break;
+                case WebClientConnectTimeoutException ignored:
+                    responseBody.setResponseCode(ALT_RESP_CODE_SYSTEM_MALFUNCTION);
+                    responseBody.setResponseText(ALT_RESP_MESSAGE_SYSTEM_MALFUNCTION);
+                    break;
+                case WebClientResponseTimeoutException ignored:
+                    responseBody.setResponseCode(ALT_RESP_CODE_TIMEOUT);
+                    responseBody.setResponseText(ALT_RESP_MESSAGE_TIMEOUT);
+                    break;
+                default:
+                    log.info("Unmap response code by exception!");
             }
-            if (exception instanceof WebClientResponseTimeoutException) {
-                responseBody.setResponseCode(ALT_RESP_CODE_TIMEOUT);
-                responseBody.setResponseText(ALT_RESP_MESSAGE_TIMEOUT);
-            }
-            if (exception instanceof WebClientConnectTimeoutException) {
-                responseBody.setResponseCode(ALT_RESP_CODE_SYSTEM_MALFUNCTION);
-                responseBody.setResponseText(ALT_RESP_MESSAGE_SYSTEM_MALFUNCTION);
-            }
-
             log.error("Error final log {}", servletRequest.getServletPath(), exception);
-            return ResponseEntity.badRequest()
-                    .body(responseBody);
+            return ResponseEntity.badRequest().body(responseBody);
         } catch (IOException e) {
-            log.error("Error handle advice", exception);
+            log.error("Error handle at advice", exception);
             return ResponseEntity.internalServerError()
                     .body(buildErrorResponseBody());
         }

@@ -102,6 +102,7 @@ public class GeneralConstant {
     public static final Integer RRN_START_IDX = 0;
     public static final Integer RRN_LENGTH = 12;
     public static final Integer SETTLEMENT_DAY_OFFSET = 1;
+    public static final Integer START_IDX_ALTO_TRX_PATH = 12;
 
     public static final DateTimeFormatter ALTO_DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
     public static final DateTimeFormatter ESB_DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
