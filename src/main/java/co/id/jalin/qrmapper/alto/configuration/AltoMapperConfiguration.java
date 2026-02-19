@@ -4,8 +4,18 @@ import co.id.jalin.qrmapper.alto.dto.AltoCustomerDto;
 import co.id.jalin.qrmapper.alto.dto.AltoMerchantDto;
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentCreditRequestDto;
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentCreditResponseDto;
+import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusRequestDto;
+import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusResponseDto;
+import co.id.jalin.qrmapper.dto.transaction.PaymentCheckRequestDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
+import co.id.jalin.qrmapper.exception.PaymentNotFoundException;
+import co.id.jalin.qrmapper.repository.TransactionLogRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +28,18 @@ import static co.id.jalin.qrmapper.util.StringUtil.generateLocalRandomRrn;
 import static co.id.jalin.qrmapper.util.StringUtil.generateLocalRandomStan;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.*;
 
+@Log4j2
 @Configuration
+@RequiredArgsConstructor
 public class AltoMapperConfiguration {
+
+    @Value("${api.path.alto.dana.context}")
+    private String contextPathAlto;
+    @Value("${api.path.alto.qr.payment}")
+    private String paymentCreditPathAlto;
+
+    private final ObjectMapper objectMapper;
+    private final TransactionLogRepository transactionLogRepository;
 
     @Bean(name = "altoModelMapper")
     public ModelMapper altoModelMapper(){
@@ -75,11 +95,71 @@ public class AltoMapperConfiguration {
                             .responseCode(ALT_RESP_CODE_DO_NOT_HONOR)
                             .responseText(ALT_RESP_MESSAGE_DO_NOT_HONOR)
                             .referenceNumber(source.getReferenceNumber())
-                            .networkReferenceNumber(source.getNetworkReferenceNumber())
+                            .networkReferenceNumber(generateLocalRandomRrn())
                             .invoiceNo(DEFAULT_INVOICE_NUMBER)
                             .currencyCode(source.getCurrencyCode())
                             .amount(source.getAmount())
                             .fee(source.getFee())
+                            .build();
+                });
+
+        // PAY CHECK REQUEST ALT-JLN
+        altoModelMapper
+                .createTypeMap(AltoPaymentStatusRequestDto.class, PaymentCheckRequestDto.class)
+                .setConverter(mappingContext -> {
+                    try {
+                        var source = mappingContext.getSource();
+                        var transactionLog = transactionLogRepository.findFirstByLeg1RrnAndApiService(source.getReferenceNumber(),contextPathAlto+paymentCreditPathAlto).orElseThrow();
+                        var esbPaymentCredit = objectMapper.readValue(transactionLog.getLeg2(), PaymentCreditRequestDto.class);
+                        var dateTime = OffsetDateTime.parse(source.getDateTime());
+                        return PaymentCheckRequestDto.builder()
+                                .pan(esbPaymentCredit.getPan())
+                                .processingCode(esbPaymentCredit.getProcessingCode().replace(PROC_CODE_26,PROC_CODE_36))
+                                .transactionAmount(esbPaymentCredit.getTransactionAmount())
+                                .transmissionDateTime(dateTime.withOffsetSameInstant(ZoneOffset.UTC).format(ESB_DATETIME_FORMAT))
+                                .systemTraceAuditNumber(generateLocalRandomStan())
+                                .localTransactionDateTime(esbPaymentCredit.getLocalTransactionDateTime())
+                                .settlementDate(esbPaymentCredit.getSettlementDate())
+                                .captureDate(esbPaymentCredit.getCaptureDate())
+                                .merchantType(esbPaymentCredit.getMerchantType())
+                                .posEntryMode(esbPaymentCredit.getPosEntryMode())
+                                .feeType(esbPaymentCredit.getFeeType())
+                                .feeAmount(esbPaymentCredit.getFeeAmount())
+                                .acquirerId(esbPaymentCredit.getAcquirerId())
+                                .issuerId(esbPaymentCredit.getIssuerId())
+                                .forwardingId(esbPaymentCredit.getForwardingId())
+                                .rrn(source.getReferenceNumber())
+                                .approvalCode(esbPaymentCredit.getApprovalCode())
+                                .terminalId(esbPaymentCredit.getTerminalId())
+                                .merchantId(esbPaymentCredit.getMerchantId())
+                                .merchantName(esbPaymentCredit.getMerchantName())
+                                .merchantCity(esbPaymentCredit.getMerchantCity())
+                                .merchantCountry(esbPaymentCredit.getMerchantCountry())
+                                .productIndicator(esbPaymentCredit.getProductIndicator())
+                                .customerData(esbPaymentCredit.getCustomerData())
+                                .merchantCriteria(esbPaymentCredit.getMerchantCriteria())
+                                .currencyCode(esbPaymentCredit.getCurrencyCode())
+                                .postalCode(esbPaymentCredit.getPostalCode())
+                                .customerPan(esbPaymentCredit.getCustomerPan())
+                                .additionalField(esbPaymentCredit.getAdditionalField())
+                                .build();
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        return null;
+                    }
+                });
+
+        // PAY STATUS DEFAULT RESPONSE
+        altoModelMapper
+                .createTypeMap(AltoPaymentStatusRequestDto.class, AltoPaymentStatusResponseDto.class)
+                .setConverter(mappingContext -> {
+                    var source = mappingContext.getSource();
+                    return AltoPaymentStatusResponseDto.builder()
+                            .responseCode(ALT_RESP_CODE_DO_NOT_HONOR)
+                            .responseText(ALT_RESP_MESSAGE_DO_NOT_HONOR)
+                            .referenceNumber(source.getReferenceNumber())
+                            .networkReferenceNumber(generateLocalRandomRrn())
+                            .invoiceNo(DEFAULT_INVOICE_NUMBER)
                             .build();
                 });
 

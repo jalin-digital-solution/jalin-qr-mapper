@@ -2,6 +2,7 @@ package co.id.jalin.qrmapper.dto.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -9,6 +10,9 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @AllArgsConstructor
-//@NoArgsConstructor
-public class PaymentCreditRequestDto extends PaymentRequestDto {
+@NoArgsConstructor
+public class PaymentResponseDto {
+
+    private String responseCode;
+    private String invoiceNumber;
 }

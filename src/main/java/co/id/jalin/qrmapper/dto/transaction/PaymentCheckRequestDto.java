@@ -10,5 +10,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 //@NoArgsConstructor
-public class PaymentCreditRequestDto extends PaymentRequestDto {
+public class PaymentCheckRequestDto extends PaymentRequestDto {
 }

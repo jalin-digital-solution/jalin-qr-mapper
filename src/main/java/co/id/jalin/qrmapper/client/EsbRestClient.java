@@ -4,6 +4,8 @@ import co.id.jalin.qrmapper.cache.CredentialDataManager;
 import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditResponseDto;
+import co.id.jalin.qrmapper.dto.transaction.PaymentRequestDto;
+import co.id.jalin.qrmapper.dto.transaction.PaymentResponseDto;
 import co.id.jalin.qrmapper.exception.WebClientConnectTimeoutException;
 import co.id.jalin.qrmapper.exception.WebClientGeneralException;
 import co.id.jalin.qrmapper.exception.WebClientResponseTimeoutException;
@@ -44,8 +46,8 @@ public class EsbRestClient {
     private final SignatureService signatureService;
     private final CredentialDataManager credentialDataManager;
 
-    public PaymentCreditResponseDto sendPayment(
-            PaymentCreditRequestDto requestDto,
+    public PaymentResponseDto sendPayment(
+            PaymentRequestDto requestDto,
             String apiPathPayment
     ) {
         try {

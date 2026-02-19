@@ -25,9 +25,12 @@ public class GeneralConstant {
     public static final String DEFAULT_STAN = "000000";
     public static final String DEFAULT_RRN = "000000000000";
     public static final String DEFAULT_INVOICE_NUMBER = "00000000000000000000";
+    public static final String DEFAULT_PROC_CODE_CHECK_STATUS = "360000";
     public static final String FEE_TYPE_CREDIT = "C";
     public static final String FEE_TYPE_DEBIT = "D";
     public static final String PI_Q001 = "Q001";
+    public static final String PROC_CODE_26 = "26";
+    public static final String PROC_CODE_36 = "36";
 
     public static final String ACCESS_TOKEN_TYPE_VALUE = "Bearer";
     public static final String X_TRACE_ID = "X-TRACE-ID";
@@ -75,6 +78,8 @@ public class GeneralConstant {
     public static final String ALT_CC_IDR = "IDR";
     public static final String ALT_RESP_CODE_SUCCESS = "001";
     public static final String ALT_RESP_MESSAGE_SUCCESS = "Success";
+    public static final String ALT_RESP_CODE_PAYMENT_FAIL = "A00";
+    public static final String ALT_RESP_MESSAGE_PAYMENT_FAIL = "QR payment fail";
     public static final String ALT_RESP_CODE_DO_NOT_HONOR = "000";
     public static final String ALT_RESP_MESSAGE_DO_NOT_HONOR = "Do not honor";
     public static final String ALT_RESP_CODE_TIMEOUT = "020";
@@ -87,6 +92,11 @@ public class GeneralConstant {
     public static final String ALT_RESP_MESSAGE_INVALID_SIGN = "Invalid signature";
     public static final String ALT_RESP_CODE_INVALID_TOKEN = "083";
     public static final String ALT_RESP_MESSAGE_INVALID_TOKEN = "Invalid token";
+    public static final String ALT_RESP_CODE_PAYMENT_NOT_FOUND = "096";
+    public static final String ALT_RESP_MESSAGE_PAYMENT_NOT_FOUND = "Requested data not found (rrn)";
+
+    public static final String ALT_RESP_MESSAGE_INVALID_HEADER = "Invalid header";
+    public static final String ALT_RESP_MESSAGE_SUSPECT = "Suspect";
 
     public static final Integer NOT_EXIST = 0;
     public static final Integer MONEY_DECIMAL_SCALE = 2;
