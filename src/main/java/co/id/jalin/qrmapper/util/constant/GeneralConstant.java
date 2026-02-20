@@ -1,5 +1,6 @@
 package co.id.jalin.qrmapper.util.constant;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class GeneralConstant {
     public static final String DEFAULT_FORWARDING_ID = "360004";
     public static final String DEFAULT_STAN = "000000";
     public static final String DEFAULT_RRN = "000000000000";
+    public static final String DEFAULT_APPROVAL_CODE = "000000";
     public static final String DEFAULT_INVOICE_NUMBER = "00000000000000000000";
     public static final String DEFAULT_PROC_CODE_CHECK_STATUS = "360000";
     public static final String FEE_TYPE_CREDIT = "C";
@@ -72,6 +74,10 @@ public class GeneralConstant {
     public static final String RESP_MESSAGE_SUCCESS = "Success";
     public static final String RESP_CODE_DO_NOT_HONOR = "05";
     public static final String RESP_MESSAGE_DO_NOT_HONOR = "Do not honor";
+    public static final String RESP_CODE_FORMAT_ERROR = "30";
+    public static final String RESP_MESSAGE_FORMAT_ERROR = "Format error";
+    public static final String RESP_CODE_TIMEOUT = "68";
+    public static final String RESP_MESSAGE_TIMEOUT = "Timeout";
     public static final String RESP_CODE_SYSTEM_MALFUNCTION = "96";
     public static final String RESP_MESSAGE_SYSTEM_MALFUNCTION = "System malfunction";
 
@@ -118,5 +124,9 @@ public class GeneralConstant {
     public static final DateTimeFormatter ESB_DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     public static final DateTimeFormatter ESB_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    public static final Map<String, String> CURRENCY_CODE = Map.of("IDR", "360");
+    public static final ZoneId ZONE_ID_JAKARTA = ZoneId.of("Asia/Jakarta");
+
+    public static final Map<String, String> CURRENCY_CODE_ALPHA_TO_NUM = Map.of("IDR", "360");
+    public static final Map<String, String> CURRENCY_CODE_NUM_TO_ALPHA = Map.of("360", "IDR");
+    public static final Map<String, String> ACCOUNT_TYPE_CODE_TO_DESC = Map.of("00", "UNSPECIFIED","10", "SAVING","30", "CREDIT","60", "E-WALLET");
 }

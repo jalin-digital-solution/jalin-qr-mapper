@@ -8,9 +8,7 @@ import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusRequestDto;
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusResponseDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCheckRequestDto;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
-import co.id.jalin.qrmapper.exception.PaymentNotFoundException;
 import co.id.jalin.qrmapper.repository.TransactionLogRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -79,7 +77,7 @@ public class AltoMapperConfiguration {
                             .productIndicator(PI_Q001)
                             .customerData(customer.getName())
                             .merchantCriteria(merchant.getCriteria())
-                            .currencyCode(CURRENCY_CODE.get(source.getCurrencyCode()))
+                            .currencyCode(CURRENCY_CODE_ALPHA_TO_NUM.get(source.getCurrencyCode()))
                             .postalCode(merchant.getPostalCode())
                             .customerPan(customer.getPan())
                             .additionalField(source.getAdditionalData())

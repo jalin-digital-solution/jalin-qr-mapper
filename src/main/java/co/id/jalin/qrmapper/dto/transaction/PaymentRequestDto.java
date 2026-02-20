@@ -48,4 +48,7 @@ public class PaymentRequestDto {
 
     private String customerPan;
     private String additionalField;
+
+    private String merchantPan;
+    private String invoiceNumber;
 }

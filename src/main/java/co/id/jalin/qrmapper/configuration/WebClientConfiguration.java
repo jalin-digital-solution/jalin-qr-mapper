@@ -38,4 +38,17 @@ public class WebClientConfiguration {
         return WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
     }
 
+    @Bean(name = "webClientAlto")
+    public WebClient webClientAlto(){
+        var httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 500)
+                .responseTimeout(Duration.ofMillis(10000))
+                .doOnConnected(connection -> connection
+                        .addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(10000, TimeUnit.MILLISECONDS))
+                )
+                .wiretap("reactor.netty.http.client.HttpClient", LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
+        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient)).build();
+    }
+
 }
