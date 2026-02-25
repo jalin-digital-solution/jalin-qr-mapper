@@ -48,6 +48,7 @@ public class GeneralConstant {
     public static final String VAR_RC_MAPPING_JALIN_TO_DANA = "RC_MAPPING_JALIN_TO_DANA";
     public static final String VAR_RC_MAPPING_DANA_TO_JALIN = "RC_MAPPING_DANA_TO_JALIN";
     public static final String VAR_ALTO_EXPIRE_TOKEN_IN_SECOND = "ALTO_EXPIRE_TOKEN_IN_SECOND";
+    public static final String VAR_SKIP_OUTGOING_REQUEST = "SKIP_OUTGOING_REQUEST";
 
     public static final String VAR_ALG = "alg";
     public static final String VAR_TYP = "typ";

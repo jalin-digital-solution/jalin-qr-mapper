@@ -1,5 +1,6 @@
 package co.id.jalin.qrmapper.client;
 
+import co.id.jalin.qrmapper.cache.ApplicationParameterManager;
 import co.id.jalin.qrmapper.cache.CredentialDataManager;
 import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
@@ -45,12 +46,17 @@ public class EsbRestClient {
     private final ObjectMapper objectMapper;
     private final SignatureService signatureService;
     private final CredentialDataManager credentialDataManager;
+    private final ApplicationParameterManager applicationParameterManager;
 
     public PaymentResponseDto sendPayment(
             PaymentRequestDto requestDto,
             String apiPathPayment
     ) {
         try {
+            if (Boolean.parseBoolean(applicationParameterManager.getApplicationParameterValueByName(VAR_SKIP_OUTGOING_REQUEST).orElse(EMPTY_STRING))) {
+                return dummyResponse(requestDto);
+            }
+
             var credentialData = credentialDataManager
                     .getCredDataByCredId(buildCredDataByCredIdKey(requestDto.getIssuerId(),apiPathPayment))
                     .orElseThrow(() -> new WebClientGeneralException("Credential data destination is not set with identifier "+ requestDto.getIssuerId()));
@@ -96,6 +102,17 @@ public class EsbRestClient {
             if (e.getCause() instanceof ConnectException) {
                 throw new WebClientConnectTimeoutException(e.getMessage());
             }
+            throw new WebClientGeneralException(e.getMessage());
+        }
+    }
+
+    public PaymentResponseDto dummyResponse(PaymentRequestDto requestDto){
+        try {
+            log.info("Dummy leg 2 RequestBody {}", objectMapper.writeValueAsString(requestDto));
+            var responseDto = PaymentResponseDto.builder().build();
+            log.info("Dummy leg 3 ResponseBody {}", objectMapper.writeValueAsString(responseDto));
+            return responseDto;
+        } catch (JsonProcessingException e) {
             throw new WebClientGeneralException(e.getMessage());
         }
     }

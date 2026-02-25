@@ -113,3 +113,4 @@ INSERT INTO application_parameter(name, value, description, created_at, updated_
 INSERT INTO application_parameter(name, value, description, created_at, updated_at) VALUES('BASE_URL_ESB', 'http://13.131.7.154:8484', 'base url for dana', NOW(), NOW());
 INSERT INTO application_parameter(name, value, description, created_at, updated_at) VALUES('BASE_URL_DANA', 'https://10.195.0.110:443/jalin', 'base url for dana', NOW(), NOW());
 INSERT INTO application_parameter(name, value, description, created_at, updated_at) VALUES('LAST_UPDATE_DB_RECOVERY', CAST(NOW() AS CHAR), 'Last recovery can write grant', NOW(), NOW());
+INSERT INTO application_parameter(name, value, description, created_at, updated_at) VALUES('SKIP_OUTGOING_REQUEST', 'true', 'Check is skip outgoing request', NOW(), NOW());
