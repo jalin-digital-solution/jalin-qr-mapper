@@ -17,10 +17,13 @@ import io.netty.handler.timeout.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,6 +48,7 @@ public class EsbRestClient {
 
     private final RequestContext requestContext;
     private final WebClient webClientEsb;
+    private final RestTemplate restTemplateEsb;
     private final ObjectMapper objectMapper;
     private final SignatureService signatureService;
     private final CredentialDataManager credentialDataManager;
@@ -68,6 +72,7 @@ public class EsbRestClient {
 //            var responseEntityStr = dummyResponse();
             var responseEntityStr = sendWebClient(uri,mapHeaders,requestDto);
             assert responseEntityStr != null;
+//            var responseEntityStr = sendRestTemplate(uri,mapHeaders,requestDto);
             logResponse(objectMapper.writeValueAsString(responseEntityStr.getHeaders().toSingleValueMap()),responseEntityStr.getBody());
             requestContext.getTransactionLog().setLeg3(responseEntityStr.getBody());
 
@@ -129,6 +134,15 @@ public class EsbRestClient {
                 })
                 .block();
     }
+
+        private ResponseEntity<String> sendRestTemplate(String uri, Map<String, String> mapHeaders, PaymentRequestDto requestDto) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAll(mapHeaders);
+            HttpEntity<PaymentRequestDto> requestEntity = new HttpEntity<>(requestDto, headers);
+            ResponseEntity<String> response = restTemplateEsb.exchange(uri,HttpMethod.POST,requestEntity,String.class);
+            log.info("RestTemplate Response Status Code {}", response.getStatusCode().value());
+            return response;
+        }
 
     private PaymentResponseDto parseResponse(ResponseEntity<String> responseEntityStr) throws JsonProcessingException, NoSuchFieldException {
         var responseDto = objectMapper.readValue(responseEntityStr.getBody(),PaymentCreditResponseDto.class);
