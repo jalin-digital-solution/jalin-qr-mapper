@@ -2,10 +2,12 @@ package co.id.jalin.qrmapper.alto.service;
 
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentCreditRequestDto;
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentCreditResponseDto;
+import co.id.jalin.qrmapper.aspect.annotation.LogExecutionTime;
 import co.id.jalin.qrmapper.cache.RcMappingManager;
 import co.id.jalin.qrmapper.client.EsbRestClient;
 import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.dto.transaction.PaymentCreditRequestDto;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -32,6 +34,8 @@ public class AltoPaymentCreditService {
     private final RcMappingManager rcMappingManager;
     private final AltoValidationService altoValidationService;
 
+    @LogExecutionTime
+//    @Observed(name = "payment.processing", contextualName = "payment-credit-process")
     public AltoPaymentCreditResponseDto paymentCredit(Map<String, String> headers, AltoPaymentCreditRequestDto requestDto){
         requestContext.getTransactionLog().setAmount(requestDto.getAmount());
         requestContext.getTransactionLog().setLeg1Rrn(requestDto.getReferenceNumber());

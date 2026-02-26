@@ -10,19 +10,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
-import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static co.id.jalin.qrmapper.util.LoggingUtil.logResponseTime;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.START_IDX_ALTO_TRX_PATH;
 
 @Order(4)
-@Log4j2
 @Component
 @RequiredArgsConstructor
 public class TransactionLogFilter extends OncePerRequestFilter {
@@ -41,10 +39,14 @@ public class TransactionLogFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain chain)
             throws ServletException, IOException {
+        var startTime = System.currentTimeMillis();
 
-        if (request.getRequestURI().startsWith(transactionBasePathEsb) || request.getRequestURI().startsWith(transactionBasePathAlto,START_IDX_ALTO_TRX_PATH)) {
-            var requestWrapper = new MultiReadHttpServletRequest(request);
-            var responseWrapper = new BufferedResponseWrapper(response);
+        if (request.getRequestURI().startsWith(transactionBasePathEsb)
+                || request.getRequestURI().startsWith(transactionBasePathAlto,START_IDX_ALTO_TRX_PATH)
+        ) {
+            // Already wrapped at logging filter
+            var requestWrapper = (MultiReadHttpServletRequest) request;
+            var responseWrapper = (BufferedResponseWrapper) response;
 
             // Init trx log only then continue
             requestContext.setTransactionLog(TransactionLog.builder().build());
@@ -56,10 +58,12 @@ public class TransactionLogFilter extends OncePerRequestFilter {
             requestContext.getTransactionLog().setLeg4(responseWrapper.getContent());
 
             transactionLogService.saveTransactionLogAsync(requestContext.getTransactionLog());
+            logResponseTime(startTime,this.getClass().getSimpleName(),"doFilterInternal()");
             return;
         }
 
         chain.doFilter(request,response);
+        logResponseTime(startTime,this.getClass().getSimpleName(),"doFilterInternal()");
     }
 
 }

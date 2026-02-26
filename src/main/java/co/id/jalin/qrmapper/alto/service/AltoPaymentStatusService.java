@@ -2,6 +2,7 @@ package co.id.jalin.qrmapper.alto.service;
 
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusRequestDto;
 import co.id.jalin.qrmapper.alto.dto.AltoPaymentStatusResponseDto;
+import co.id.jalin.qrmapper.aspect.annotation.LogExecutionTime;
 import co.id.jalin.qrmapper.cache.RcMappingManager;
 import co.id.jalin.qrmapper.client.EsbRestClient;
 import co.id.jalin.qrmapper.context.RequestContext;
@@ -36,6 +37,8 @@ public class AltoPaymentStatusService {
     private final RcMappingManager rcMappingManager;
     private final AltoValidationService altoValidationService;
 
+    @LogExecutionTime
+//    @Observed(name = "payment.processing", contextualName = "payment-status-process")
     public AltoPaymentStatusResponseDto paymentStatus(Map<String, String> headers, AltoPaymentStatusRequestDto requestDto){
         requestContext.getTransactionLog().setLeg1Rrn(requestDto.getReferenceNumber());
 

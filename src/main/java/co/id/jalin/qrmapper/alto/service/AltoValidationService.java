@@ -1,5 +1,6 @@
 package co.id.jalin.qrmapper.alto.service;
 
+import co.id.jalin.qrmapper.aspect.annotation.LogExecutionTime;
 import co.id.jalin.qrmapper.cache.CredentialDataManager;
 import co.id.jalin.qrmapper.context.RequestContext;
 import co.id.jalin.qrmapper.entity.CredentialData;
@@ -8,6 +9,7 @@ import co.id.jalin.qrmapper.exception.JwtException;
 import co.id.jalin.qrmapper.exception.SignatureException;
 import co.id.jalin.qrmapper.service.JwtAuthenticationService;
 import co.id.jalin.qrmapper.service.SignatureService;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class AltoValidationService {
     private final SignatureService signatureService;
     private final RequestContext requestContext;
 
+    @LogExecutionTime
+//    @Observed(name = "validation.processing", contextualName = "validate-header-process")
     public void validateHeaders(Map<String, String> h, String relativeUrl) {
         if (isBlank(h.get(AUTHORIZATION))) throw new HttpHeaderException("Missing Authorization");
         if (isBlank(h.get(X_CLIENT_KEY)))  throw new HttpHeaderException("Missing X-CLIENT-KEY");

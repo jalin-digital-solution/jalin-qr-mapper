@@ -17,12 +17,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static co.id.jalin.qrmapper.util.LoggingUtil.logResponseTime;
 import static co.id.jalin.qrmapper.util.StringUtil.handlePostMethod;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.DOUBLE_DASH;
 import static co.id.jalin.qrmapper.util.constant.GeneralConstant.X_TRACE_ID;
@@ -38,30 +37,18 @@ public class LoggingFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
     private final RequestContext requestContext;
 
-    // Exclude paths that don't need logging (optional)
-    private final List<String> EXCLUDE_PATHS = Arrays.asList(
-            "/health", "/actuator", "/favicon.ico"
-    );
-
     @Override
     public void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain chain)
             throws IOException, ServletException {
+        var startTime = System.currentTimeMillis();
 
         String traceId = tracer.currentSpan() != null ? Objects.requireNonNull(tracer.currentSpan()).context().traceId() : DOUBLE_DASH;
         response.setHeader(X_TRACE_ID, traceId);
 
-        String path = request.getRequestURI();
-        // Skip logging for excluded paths
-        if (shouldExclude(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         // Wrap request and response for content caching
-        long startTime = System.currentTimeMillis();
         var requestWrapper = new MultiReadHttpServletRequest(request);
         var responseWrapper = new BufferedResponseWrapper(response);
 
@@ -84,11 +71,7 @@ public class LoggingFilter extends OncePerRequestFilter {
         log.info("ResponseHeader {}", objectMapper.writeValueAsString(mapHeaderResponse));
         log.info("ResponseBody {}", responseWrapper.getContent());
 
-        long duration = System.currentTimeMillis() - startTime;
-        log.info("ResponseTime {}ms",duration);
+        logResponseTime(startTime,this.getClass().getSimpleName(),"doFilterInternal()");
     }
 
-    private boolean shouldExclude(String path) {
-        return EXCLUDE_PATHS.stream().anyMatch(path::contains);
-    }
 }
